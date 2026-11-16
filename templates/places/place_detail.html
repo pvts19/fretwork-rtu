@@ -4,6 +4,14 @@
 <a href="{% url 'places:list' %}">&larr; Все места</a>
 <h1 class="mt-2">{{ place.name }}</h1>
 <p><span class="badge rs-badge">{{ place.category }}</span></p>
+<div class="mb-3">
+  <a class="btn btn-success" href="{% url 'visits:create' %}?place={{ place.id }}">Запланировать посещение</a>
+  <a class="btn btn-outline-secondary" href="{% url 'places:edit' place.slug %}">Редактировать</a>
+</div>
+{% if place.image %}
+  <img src="{{ place.image.url }}" class="img-fluid rounded-3 mb-3 rs-photo" alt="Фото: {{ place.name }}">
+{% endif %}
+{% if place.description %}<p class="lead">{{ place.description|linebreaksbr }}</p>{% endif %}
 <dl class="row bg-white rounded-3 p-3 shadow-sm">
   <dt class="col-sm-3">Адрес</dt><dd class="col-sm-9">{{ place.address }}</dd>
   <dt class="col-sm-3">Цена</dt>

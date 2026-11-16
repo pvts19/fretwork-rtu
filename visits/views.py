@@ -1,11 +1,14 @@
 from datetime import date
 
 from django.db.models import Avg, Count, Max, Min, Q, Sum
-from django.shortcuts import get_object_or_404, render
+from django.contrib import messages
+from django.shortcuts import get_object_or_404, redirect, render
+from django.views.decorators.http import require_POST
 
 from homepage.pagination import paginate
 from places.models import Place
 from users.models import User
+from visits.forms import VisitForm
 from visits.models import Visit
 
 SORT_OPTIONS = {
@@ -83,3 +86,42 @@ def stats(request):
             .filter(cnt__gt=1).order_by('-cnt')),
     }
     return render(request, 'visits/stats.html', context)
+
+
+def visit_create(request):
+    initial = {}
+    place = request.GET.get('place', '')
+    if place.isdigit():
+        initial['place'] = int(place)
+    form = VisitForm(request.POST or None, initial=initial)
+    if form.is_valid():
+        visit = form.save()
+        messages.success(request, f'Посещение №{visit.pk} запланировано.')
+        return redirect(visit)
+    return render(request, 'visits/visit_form.html', {'form': form})
+
+
+def visit_edit(request, visit_id):
+    visit = get_object_or_404(Visit, pk=visit_id)
+    if visit.status != Visit.Status.ACTIVE:
+        messages.warning(request, 'Изменить можно только активное посещение.')
+        return redirect(visit)
+    form = VisitForm(request.POST or None, instance=visit)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Изменения сохранены.')
+        return redirect(visit)
+    return render(request, 'visits/visit_form.html',
+                  {'form': form, 'visit': visit})
+
+
+@require_POST
+def visit_cancel(request, visit_id):
+    visit = get_object_or_404(Visit, pk=visit_id)
+    try:
+        visit.cancel()
+    except ValueError as error:
+        messages.error(request, str(error))
+    else:
+        messages.success(request, f'Посещение №{visit.pk} отменено.')
+    return redirect(visit)

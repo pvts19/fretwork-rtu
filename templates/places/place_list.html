@@ -3,34 +3,21 @@
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-3">
   <h1 class="mb-0">Места для отдыха</h1>
-  <a class="btn btn-outline-success" href="{% url 'places:free' %}">Свободные места на дату</a>
+  <div>
+    <a class="btn btn-outline-success" href="{% url 'places:free' %}">Свободные места на дату</a>
+    <a class="btn btn-success" href="{% url 'places:create' %}">Добавить место</a>
+  </div>
 </div>
 <form method="get" class="row g-2 mb-3">
-  <div class="col-md-4">
-    <input class="form-control" type="search" name="q" value="{{ text }}"
-           placeholder="Поиск по названию или адресу" aria-label="Поиск">
-  </div>
-  <div class="col-md-2">
-    <select class="form-select" name="category" aria-label="Категория">
-      <option value="">Все категории</option>
-      {% for value, label in categories %}
-        <option value="{{ value }}" {% if value == category %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </div>
-  <div class="col-md-2">
-    <input class="form-control" type="number" min="0" name="max_price" value="{{ max_price }}"
-           placeholder="Цена до" aria-label="Максимальная цена">
-  </div>
-  <div class="col-md-2">
-    <select class="form-select" name="sort" aria-label="Сортировка">
-      {% for value, label in sort_options.items %}
-        <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
-      {% endfor %}
-    </select>
-  </div>
+  <div class="col-md-4">{{ form.q }}</div>
+  <div class="col-md-2">{{ form.category }}</div>
+  <div class="col-md-2">{{ form.max_price }}</div>
+  <div class="col-md-2">{{ form.sort }}</div>
   <div class="col-md-2 d-grid"><button class="btn btn-success">Найти</button></div>
+  {% for field in form %}{% for error in field.errors %}<div class="text-danger small">{{ field.label }}: {{ error }}</div>{% endfor %}{% endfor %}
 </form>
+<input id="place-filter" class="form-control mb-3" type="search"
+       placeholder="Быстрый фильтр на этой странице…" aria-label="Быстрый фильтр">
 <p class="text-muted small">Найдено: {{ page_obj.paginator.count }}</p>
 <div class="row">
   {% for place in page_obj %}
@@ -39,5 +26,6 @@
     <p class="text-muted">Ничего не найдено.</p>
   {% endfor %}
 </div>
+<p id="place-filter-empty" class="text-muted d-none">Ничего не найдено.</p>
 {% include "includes/pagination.html" %}
 {% endblock %}

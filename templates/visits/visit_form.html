@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{% if visit %}Посещение №{{ visit.id }}{% else %}Новое посещение{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-6">
+  <h1 class="mb-4">{% if visit %}Изменить посещение №{{ visit.id }}{% else %}Запланировать посещение{% endif %}</h1>
+  <form method="post" class="bg-white p-4 rounded-3 shadow-sm" novalidate>
+    {% csrf_token %}
+    {% include "includes/form_fields.html" %}
+    <button class="btn btn-success">Сохранить</button>
+    <a class="btn btn-link" href="{% if visit %}{{ visit.get_absolute_url }}{% else %}{% url 'visits:list' %}{% endif %}">Отмена</a>
+  </form>
+</div></div>
+{% endblock %}

@@ -210,15 +210,67 @@ python manage.py runserver      # http://127.0.0.1:8000/admin/
 список посещений — 4 запроса (`select_related('place', 'user')`),
 карточка посещения — 1, список мест — 2, статистика — 6.
 
+## Формы Django (ПР11)
+
+| Форма | Класс | Где используется |
+|---|---|---|
+| `PlaceSearchForm` | `forms.Form` (GET) | поиск, фильтр по категории и цене, сортировка на `/places/` |
+| `PlaceForm` | `forms.ModelForm` | `/places/create/`, `/places/<slug>/edit/` — с загрузкой фото |
+| `VisitForm` | `forms.ModelForm` | `/visits/create/`, `/visits/<id>/edit/` |
+
+Отмена посещения — `POST /visits/<id>/cancel/` (`@require_POST`, GET даёт
+405). Все формы, меняющие данные, отправляются методом POST с
+`{% csrf_token %}`; после успешного сохранения — redirect и сообщение
+(`django.contrib.messages`).
+
+Валидация на сервере:
+
+- `validate_not_past` (свой валидатор, `visits/validators.py`) и
+  `clean_date()` — нельзя запланировать посещение на прошедшую дату;
+- `VisitForm.clean()` — на выбранную дату в месте должна хватать
+  вместимости; учитываются только `Visit.objects.active()`, при
+  редактировании посещение не конфликтует само с собой;
+- `PlaceForm.clean_capacity()`, `clean_name()` и `clean()` (время закрытия
+  не равно времени открытия); стандартные валидаторы полей модели
+  (`MinValueValidator`, `MaxValueValidator`, уникальный e-mail).
+
+Виджеты оформлены классами Bootstrap (`form-control`, `form-select`),
+описание места — многострочное поле `Textarea(rows=4)`, дата —
+`<input type="date">`. Ошибки выводятся под полями и над формой
+(`includes/form_fields.html`).
+
+Загрузка изображений: поле `Place.image` (`ImageField`, Pillow),
+`MEDIA_URL = 'media/'`, `MEDIA_ROOT = BASE_DIR / 'media'`, форма с
+`enctype="multipart/form-data"`, в представлении передаётся `request.FILES`.
+Загруженные файлы лежат в `media/` и в Git не попадают.
+
+## Проверка проекта
+
+```bash
+python manage.py check
+python manage.py makemigrations --check --dry-run
+flake8
+pytest -v        # 49 тестов: консольная версия, SQL, ORM, админка, формы
+```
+
 ## Запуск
 
 ```bash
 python3 -m venv venv
-source venv/bin/activate
+source venv/bin/activate          # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-python main.py       # консольное приложение
-pytest               # тесты
-flake8               # проверка оформления кода
+
+# веб-приложение
+python manage.py migrate
+python manage.py import_data      # данные из data/restspot.sqlite
+python manage.py createsuperuser  # для /admin/
+python manage.py runserver        # http://127.0.0.1:8000/
+
+# консольная версия (ПР1–ПР3)
+python main.py
+
+pytest                            # тесты
+flake8                            # проверка оформления кода
 ```
 
 ## План развития

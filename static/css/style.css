@@ -10,3 +10,4 @@ body { background: var(--rs-bg); }
 .rs-card:hover { transform: translateY(-3px); }
 .rs-footer { border-top: 1px solid #dfe9e3; }
 .btn-success { background: var(--rs-green); border-color: var(--rs-green); }
+.rs-photo { max-height: 360px; object-fit: cover; width: 100%; }

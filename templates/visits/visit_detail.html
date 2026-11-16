@@ -13,4 +13,14 @@
   <dt class="col-sm-3">Статус</dt><dd class="col-sm-9">{{ visit.get_status_display }}</dd>
   <dt class="col-sm-3">Оценка</dt><dd class="col-sm-9">{{ visit.rating|default:"—" }}</dd>
 </dl>
+{% if visit.status == 'active' %}
+<div class="d-flex gap-2">
+  <a class="btn btn-outline-secondary" href="{% url 'visits:edit' visit.id %}">Изменить</a>
+  <form method="post" action="{% url 'visits:cancel' visit.id %}"
+        onsubmit="return confirm('Отменить посещение?');">
+    {% csrf_token %}
+    <button class="btn btn-outline-danger">Отменить посещение</button>
+  </form>
+</div>
+{% endif %}
 {% endblock %}

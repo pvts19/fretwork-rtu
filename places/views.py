@@ -1,53 +1,37 @@
 from datetime import date
 
+from django.contrib import messages
 from django.db.models import Avg, Count, Q, Sum
 from django.db.models.functions import Coalesce
-from django.shortcuts import get_object_or_404, render
+from django.shortcuts import get_object_or_404, redirect, render
 
 from homepage.pagination import paginate
+from places.forms import PlaceForm, PlaceSearchForm
 from places.models import Place
 from visits.models import Visit
 
-SORT_OPTIONS = {
-    'name': 'По названию',
-    'price': 'Сначала дешёвые',
-    '-price': 'Сначала дорогие',
-    '-rating': 'По рейтингу',
-    '-visits_count': 'По популярности',
-}
-
 
 def place_list(request):
+    form = PlaceSearchForm(request.GET or None)
     places = Place.objects.annotate(
         rating=Avg('visits__rating'),
         visits_count=Count('visits', filter=~Q(
             visits__status=Visit.Status.CANCELLED)),
     )
-    text = request.GET.get('q', '').strip()
-    category = request.GET.get('category', '')
-    max_price = request.GET.get('max_price', '')
-    sort = request.GET.get('sort', 'name')
-    if text:
-        places = places.filter(Q(name__icontains=text)
-                               | Q(address__icontains=text))
-    if category:
-        places = places.filter(category=category)
-    if max_price.isdigit():
-        places = places.filter(price__lte=int(max_price))
-    if sort not in SORT_OPTIONS:
-        sort = 'name'
-    places = places.order_by(sort, 'name')
-    page_obj, querystring = paginate(request, places)
-    context = {
-        'page_obj': page_obj,
-        'querystring': querystring,
-        'categories': Place.Category.choices,
-        'sort_options': SORT_OPTIONS,
-        'text': text,
-        'category': category,
-        'max_price': max_price,
-        'sort': sort,
-    }
+    sort = 'name'
+    if form.is_valid():
+        data = form.cleaned_data
+        if data['q']:
+            places = places.filter(Q(name__icontains=data['q'])
+                                   | Q(address__icontains=data['q']))
+        if data['category']:
+            places = places.filter(category=data['category'])
+        if data['max_price'] is not None:
+            places = places.filter(price__lte=data['max_price'])
+        sort = data['sort'] or 'name'
+    page_obj, querystring = paginate(request, places.order_by(sort, 'name'))
+    context = {'form': form, 'page_obj': page_obj,
+               'querystring': querystring}
     return render(request, 'places/place_list.html', context)
 
 
@@ -84,3 +68,24 @@ def free_places(request):
             for place in context['places']:
                 place.free = place.capacity - place.booked
     return render(request, 'places/free_places.html', context)
+
+
+def place_create(request):
+    form = PlaceForm(request.POST or None, request.FILES or None)
+    if form.is_valid():
+        place = form.save()
+        messages.success(request, f'Место «{place}» добавлено.')
+        return redirect(place)
+    return render(request, 'places/place_form.html', {'form': form})
+
+
+def place_edit(request, slug):
+    place = get_object_or_404(Place, slug=slug)
+    form = PlaceForm(request.POST or None, request.FILES or None,
+                     instance=place)
+    if form.is_valid():
+        form.save()
+        messages.success(request, 'Изменения сохранены.')
+        return redirect(place)
+    return render(request, 'places/place_form.html',
+                  {'form': form, 'place': place})

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{% if place %}Редактирование: {{ place.name }}{% else %}Новое место{% endif %}{% endblock %}
+{% block content %}
+<div class="row justify-content-center"><div class="col-lg-7">
+  <h1 class="mb-4">{% if place %}Редактирование места{% else %}Новое место{% endif %}</h1>
+  <form method="post" enctype="multipart/form-data" class="bg-white p-4 rounded-3 shadow-sm" novalidate>
+    {% csrf_token %}
+    {% include "includes/form_fields.html" %}
+    <button class="btn btn-success">Сохранить</button>
+    <a class="btn btn-link" href="{% if place %}{{ place.get_absolute_url }}{% else %}{% url 'places:list' %}{% endif %}">Отмена</a>
+  </form>
+</div></div>
+{% endblock %}

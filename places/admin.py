@@ -23,7 +23,8 @@ class PlaceAdmin(admin.ModelAdmin):
     list_per_page = 20
     inlines = (VisitInline,)
     fieldsets = (
-        (None, {'fields': ('name', 'slug', 'category', 'address')}),
+        (None, {'fields': ('name', 'slug', 'category', 'address',
+                           'description', 'image')}),
         ('Условия посещения', {'fields': ('price', 'capacity',
                                           'open_hour', 'close_hour')}),
     )

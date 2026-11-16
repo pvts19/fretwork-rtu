@@ -27,6 +27,8 @@ class Place(models.Model):
         'открывается (час)', validators=[MaxValueValidator(24)])
     close_hour = models.PositiveSmallIntegerField(
         'закрывается (час)', validators=[MaxValueValidator(24)])
+    description = models.TextField('описание', blank=True)
+    image = models.ImageField('фото', upload_to='places/', blank=True)
 
     class Meta:
         ordering = ['name']
