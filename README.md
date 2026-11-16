@@ -103,6 +103,41 @@ python manage.py check
 python manage.py runserver    # http://127.0.0.1:8000/
 ```
 
+## База данных SQLite (ПР7)
+
+Структура (`sql/schema.sql`):
+
+| Таблица | Поля | Ключи |
+|---|---|---|
+| `places` | id, name, category, address, price, capacity, open_hour, close_hour | PK `id` |
+| `users` | id, name, email (UNIQUE) | PK `id` |
+| `visits` | id, place_id, user_id, date, people, status, rating (NULL — нет оценки) | PK `id`, FK `place_id → places.id`, FK `user_id → users.id` |
+
+Файлы:
+
+- `sql/schema.sql` — создание таблиц;
+- `sql/queries.sql` — 12 проверенных запросов (выборка, WHERE, JOIN,
+  COUNT/SUM/AVG, GROUP BY, HAVING);
+- `db/database.py` — подключение (`row_factory = sqlite3.Row`,
+  `PRAGMA foreign_keys = ON`), функции `fetch_all` / `fetch_one`;
+- `db/queries.py` — те же запросы с параметрами `:name` для представлений;
+- `db/import_json.py` — создание базы и перенос данных из JSON;
+- `data/restspot.sqlite` — файл базы.
+
+```bash
+python -m db.import_json                    # пересоздать базу из JSON
+sqlite3 data/restspot.sqlite < sql/queries.sql
+```
+
+Новые страницы: `/places/free/?date=…&people=…` — места со свободной
+вместимостью на дату (учитываются только активные посещения),
+`/visits/stats/` — статистика. На странице мест работают поиск (`?q=`) и
+фильтр по категории (`?category=`), на странице посещений — фильтр по
+статусу. Все значения передаются в запросы только параметрами.
+
+Ограничение: в SQLite `LIKE` без учёта регистра работает только для
+латиницы, поэтому поиск по русскому тексту чувствителен к регистру.
+
 ## Запуск
 
 ```bash

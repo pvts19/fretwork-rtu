@@ -12,6 +12,8 @@
          href="{% url 'places:list' %}">Места</a>
       <a class="nav-link {% if request.resolver_match.app_name == 'visits' %}active{% endif %}"
          href="{% url 'visits:list' %}">Посещения</a>
+      <a class="nav-link" href="{% url 'places:free' %}">Свободно на дату</a>
+      <a class="nav-link" href="{% url 'visits:stats' %}">Статистика</a>
     </div>
   </div>
 </nav>

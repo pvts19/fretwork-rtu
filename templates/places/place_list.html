@@ -1,14 +1,32 @@
 {% extends "base.html" %}
 {% block title %}Места{% endblock %}
 {% block content %}
-<h1 class="mb-3">Места для отдыха</h1>
+<div class="d-flex justify-content-between align-items-center mb-3">
+  <h1 class="mb-0">Места для отдыха</h1>
+  <a class="btn btn-outline-success" href="{% url 'places:free' %}">Свободные места на дату</a>
+</div>
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-5">
+    <input class="form-control" type="search" name="q" value="{{ text }}"
+           placeholder="Поиск по названию или адресу" aria-label="Поиск">
+  </div>
+  <div class="col-md-4">
+    <select class="form-select" name="category" aria-label="Категория">
+      <option value="">Все категории</option>
+      {% for c in categories %}
+        <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-3 d-grid"><button class="btn btn-success">Найти</button></div>
+</form>
 <input id="place-filter" class="form-control mb-4" type="search"
-       placeholder="Быстрый фильтр по названию или адресу…" aria-label="Фильтр мест">
+       placeholder="Быстрый фильтр без перезагрузки…" aria-label="Фильтр мест">
 <div class="row">
   {% for place in places %}
     {% include "includes/place_card.html" %}
   {% empty %}
-    <p class="text-muted">Мест пока нет.</p>
+    <p class="text-muted">Ничего не найдено.</p>
   {% endfor %}
 </div>
 <p id="place-filter-empty" class="text-muted d-none">Ничего не найдено.</p>

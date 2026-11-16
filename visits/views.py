@@ -1,29 +1,38 @@
 from django.http import Http404
 from django.shortcuts import render
 
-from place_service import find_place
-from storage import load_places, load_users, load_visits
+from db import queries as q
+from db.database import fetch_all, fetch_one
+
+STATUS_CHOICES = [('', 'Все'), ('active', 'Активные'),
+                  ('done', 'Завершённые'), ('cancelled', 'Отменённые')]
 
 
 def visit_list(request):
-    places = load_places()
-    users = {u.id: u for u in load_users()}
-    rows = [{'visit': v, 'place': find_place(places, v.place_id),
-             'user': users.get(v.user_id)}
-            for v in sorted(load_visits(), key=lambda v: v.date)]
-    return render(request, 'visits/visit_list.html', {'rows': rows})
+    status = request.GET.get('status', '')
+    if status not in dict(STATUS_CHOICES):
+        status = ''
+    context = {
+        'visits': fetch_all(q.VISIT_LIST, {'status': status}),
+        'status': status,
+        'status_choices': STATUS_CHOICES,
+    }
+    return render(request, 'visits/visit_list.html', context)
 
 
 def visit_detail(request, visit_id):
-    visit = next((v for v in load_visits() if v.id == visit_id), None)
+    visit = fetch_one(q.VISIT_DETAIL, {'id': visit_id})
     if visit is None:
         raise Http404('Посещение не найдено')
-    place = find_place(load_places(), visit.place_id)
-    user = next((u for u in load_users() if u.id == visit.user_id), None)
+    return render(request, 'visits/visit_detail.html', {'visit': visit})
+
+
+def stats(request):
     context = {
-        'visit': visit,
-        'place': place,
-        'user': user,
-        'cost': place.cost(visit.people) if place else None,
+        'totals': fetch_one(q.TOTALS),
+        'by_status': fetch_all(q.VISITS_BY_STATUS),
+        'by_place': fetch_all(q.VISITS_BY_PLACE),
+        'ratings': fetch_all(q.PLACE_RATINGS),
+        'popular': fetch_all(q.POPULAR_PLACES, {'min_count': 1}),
     }
-    return render(request, 'visits/visit_detail.html', context)
+    return render(request, 'visits/stats.html', context)

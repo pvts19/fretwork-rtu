@@ -1,14 +1,14 @@
 from django.shortcuts import render
 
-from place_service import categories
-from storage import load_places, load_visits
+from db import queries as q
+from db.database import fetch_all, fetch_one
 
 
 def index(request):
-    places = load_places()
+    totals = fetch_one(q.TOTALS)
     context = {
-        'places_count': len(places),
-        'active_count': sum(v.is_active for v in load_visits()),
-        'categories': sorted(categories(places)),
+        'places_count': totals['places'],
+        'active_count': totals['active'] or 0,
+        'categories': [r['category'] for r in fetch_all(q.CATEGORIES)],
     }
     return render(request, 'homepage/index.html', context)

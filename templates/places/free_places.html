@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Свободные места{% endblock %}
+{% block content %}
+<h1 class="mb-3">Свободные места на дату</h1>
+<form method="get" class="row g-2 mb-4">
+  <div class="col-md-5">
+    <label class="form-label" for="date">Дата</label>
+    <input class="form-control" type="date" id="date" name="date" value="{{ day }}" required>
+  </div>
+  <div class="col-md-4">
+    <label class="form-label" for="people">Сколько человек</label>
+    <input class="form-control" type="number" id="people" name="people" min="1" value="{{ people }}">
+  </div>
+  <div class="col-md-3 d-grid align-items-end"><button class="btn btn-success">Показать</button></div>
+</form>
+{% if error %}<div class="alert alert-danger">{{ error }}</div>{% endif %}
+{% if places is not None %}
+  <div class="row">
+    {% for place in places %}
+      <div class="col-md-6 col-lg-4 mb-3">
+        <div class="card h-100 shadow-sm rs-card"><div class="card-body">
+          <span class="badge rs-badge mb-2">{{ place.category }}</span>
+          <h5>{{ place.name }}</h5>
+          <p class="mb-1">Свободно: <b>{{ place.free }}</b> из {{ place.capacity }}</p>
+          <a href="{% url 'places:detail' place.id %}" class="btn btn-sm btn-success">Подробнее</a>
+        </div></div>
+      </div>
+    {% empty %}
+      <p class="text-muted">На эту дату нет мест с нужной вместимостью.</p>
+    {% endfor %}
+  </div>
+{% endif %}
+{% endblock %}
