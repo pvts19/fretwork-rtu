@@ -79,16 +79,24 @@ Django-приложений.
 
 ## Веб-приложение (Django)
 
-| URL | View-функция | Страница |
-|---|---|---|
-| `/` | `homepage.views.index` | главная |
-| `/places/` | `places.views.place_list` | список мест |
-| `/places/<id>/` | `places.views.place_detail` | карточка места |
-| `/visits/` | `visits.views.visit_list` | список посещений |
-| `/visits/<id>/` | `visits.views.visit_detail` | карточка посещения |
+| URL | Имя маршрута | Шаблон | Страница |
+|---|---|---|---|
+| `/` | `homepage:index` | `homepage/index.html` | главная |
+| `/places/` | `places:list` | `places/place_list.html` | список мест |
+| `/places/<id>/` | `places:detail` | `places/place_detail.html` | карточка места |
+| `/visits/` | `visits:list` | `visits/visit_list.html` | список посещений |
+| `/visits/<id>/` | `visits:detail` | `visits/visit_detail.html` | карточка посещения |
 
-Данные пока берутся из JSON через классы ПР3 (`storage.py`),
-оформление — Bootstrap 5. Для несуществующих объектов возвращается 404.
+Шаблоны (`templates/`): базовый `base.html` с блоками `title` и
+`content`, включаемые `includes/navbar.html`, `includes/footer.html`,
+`includes/place_card.html`. Используются `{% for %}…{% empty %}`, `{% if %}`,
+`{% url %}` с пространствами имён, фильтры `date`, `floatformat`, `default`,
+`pluralize`, `truncatechars`, `upper`, `lower`, `capfirst`.
+
+Статика (`static/`): `css/style.css` — собственное оформление поверх
+Bootstrap 5, `img/logo.svg`, `img/hero.svg`, `js/main.js` — быстрый фильтр
+карточек на странице мест. Данные берутся из JSON через классы ПР3.
+Для несуществующих объектов возвращается 404.
 
 ```bash
 python manage.py check

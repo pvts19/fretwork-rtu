@@ -1,0 +1,17 @@
+{% load static %}
+<nav class="navbar navbar-expand navbar-dark rs-navbar">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" href="{% url 'homepage:index' %}">
+      <img src="{% static 'img/logo.svg' %}" alt="Логотип RestSpot" width="32" height="32">
+      RestSpot
+    </a>
+    <div class="navbar-nav">
+      <a class="nav-link {% if request.resolver_match.app_name == 'homepage' %}active{% endif %}"
+         href="{% url 'homepage:index' %}">Главная</a>
+      <a class="nav-link {% if request.resolver_match.app_name == 'places' %}active{% endif %}"
+         href="{% url 'places:list' %}">Места</a>
+      <a class="nav-link {% if request.resolver_match.app_name == 'visits' %}active{% endif %}"
+         href="{% url 'visits:list' %}">Посещения</a>
+    </div>
+  </div>
+</nav>

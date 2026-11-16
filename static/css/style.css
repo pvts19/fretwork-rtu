@@ -1,0 +1,12 @@
+:root {
+  --rs-green: #2e8b57;
+  --rs-green-dark: #1f6b42;
+  --rs-bg: #f2f7f4;
+}
+body { background: var(--rs-bg); }
+.rs-navbar { background: linear-gradient(90deg, var(--rs-green-dark), var(--rs-green)); }
+.rs-badge { background: var(--rs-green); }
+.rs-card { border: none; border-radius: 14px; transition: transform .15s; }
+.rs-card:hover { transform: translateY(-3px); }
+.rs-footer { border-top: 1px solid #dfe9e3; }
+.btn-success { background: var(--rs-green); border-color: var(--rs-green); }

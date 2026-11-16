@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Места{% endblock %}
+{% block content %}
+<h1 class="mb-3">Места для отдыха</h1>
+<input id="place-filter" class="form-control mb-4" type="search"
+       placeholder="Быстрый фильтр по названию или адресу…" aria-label="Фильтр мест">
+<div class="row">
+  {% for place in places %}
+    {% include "includes/place_card.html" %}
+  {% empty %}
+    <p class="text-muted">Мест пока нет.</p>
+  {% endfor %}
+</div>
+<p id="place-filter-empty" class="text-muted d-none">Ничего не найдено.</p>
+{% endblock %}

@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Посещения{% endblock %}
+{% block content %}
+<h1 class="mb-4">Посещения</h1>
+{% if rows %}
+<table class="table table-hover bg-white shadow-sm">
+  <thead><tr><th>№</th><th>Дата</th><th>Место</th><th>Пользователь</th><th>Человек</th><th>Статус</th></tr></thead>
+  <tbody>
+  {% for row in rows %}
+    <tr class="{% if row.visit.status == 'cancelled' %}text-muted{% endif %}">
+      <td><a href="{% url 'visits:detail' row.visit.id %}">№{{ row.visit.id }}</a></td>
+      <td>{{ row.visit.day|date:"d.m.Y" }}</td>
+      <td>{% if row.place %}<a href="{% url 'places:detail' row.place.id %}">{{ row.place.name }}</a>{% else %}—{% endif %}</td>
+      <td>{{ row.user.name|default:"—" }}</td>
+      <td>{{ row.visit.people }}</td>
+      <td>{{ row.visit.status_label|capfirst }}</td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">Посещений пока нет.</p>
+{% endif %}
+{% endblock %}

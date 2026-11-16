@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %}Главная{% endblock %}
+{% block content %}
+<div class="row align-items-center p-4 mb-4 bg-white rounded-4 shadow-sm">
+  <div class="col-md-7">
+    <h1 class="display-5">Куда сходить отдохнуть?</h1>
+    <p class="lead">Парки, кафе, пляжи, музеи и базы отдыха. Подберите место
+      по бюджету и запланируйте поход с друзьями.</p>
+    <p>
+      В каталоге <b>{{ places_count }}</b> мест{{ places_count|pluralize:"о,а" }},
+      активных посещений: <b>{{ active_count }}</b>.
+    </p>
+    <a class="btn btn-success" href="{% url 'places:list' %}">Смотреть места</a>
+    <a class="btn btn-outline-success" href="{% url 'visits:list' %}">Посещения</a>
+  </div>
+  <div class="col-md-5 text-center">
+    <img src="{% static 'img/hero.svg' %}" class="img-fluid" alt="Иллюстрация: отдых на природе">
+  </div>
+</div>
+<h2 class="h4 mb-3">Популярные категории</h2>
+<ul class="list-inline">
+  {% for category in categories %}
+    <li class="list-inline-item"><span class="badge rs-badge fs-6">{{ category|upper }}</span></li>
+  {% empty %}
+    <li>Категорий пока нет</li>
+  {% endfor %}
+</ul>
+{% endblock %}

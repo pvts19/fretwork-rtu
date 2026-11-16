@@ -62,6 +62,15 @@ class Visit(Entity):
         self._status = DONE
         self.rating = rating
 
+    @property
+    def day(self) -> date:
+        """Дата посещения как объект date (для шаблонов и сравнений)."""
+        return date.fromisoformat(self.date)
+
+    @property
+    def status_label(self) -> str:
+        return STATUSES[self._status]
+
     @staticmethod
     def is_past(day: str) -> bool:
         return date.fromisoformat(day) < date.today()
