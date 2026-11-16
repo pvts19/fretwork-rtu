@@ -1,0 +1,8 @@
+[
+  {"id": 1, "name": "Парк Горького", "category": "Парк", "address": "ул. Крымский Вал, 9", "price": 0, "capacity": 500, "open_hour": 6, "close_hour": 24},
+  {"id": 2, "name": "Кафе «Веранда»", "category": "Кафе", "address": "Пятницкая ул., 12", "price": 1200, "capacity": 40, "open_hour": 10, "close_hour": 23},
+  {"id": 3, "name": "Пляж «Серебряный Бор»", "category": "Пляж", "address": "Таманская ул., 2", "price": 300, "capacity": 300, "open_hour": 8, "close_hour": 21},
+  {"id": 4, "name": "Третьяковская галерея", "category": "Музей", "address": "Лаврушинский пер., 10", "price": 750, "capacity": 200, "open_hour": 10, "close_hour": 18},
+  {"id": 5, "name": "База отдыха «Сосны»", "category": "База отдыха", "address": "Истринский р-н, д. Лопотово", "price": 3500, "capacity": 30, "open_hour": 0, "close_hour": 24},
+  {"id": 6, "name": "Антикафе «Время»", "category": "Кафе", "address": "Мясницкая ул., 24", "price": 450, "capacity": 25, "open_hour": 12, "close_hour": 2}
+]
