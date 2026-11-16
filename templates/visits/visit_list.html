@@ -5,31 +5,52 @@
   <h1 class="mb-0">Посещения</h1>
   <a class="btn btn-outline-success" href="{% url 'visits:stats' %}">Статистика</a>
 </div>
-<ul class="nav nav-pills mb-3">
-  {% for value, label in status_choices %}
-    <li class="nav-item">
-      <a class="nav-link {% if value == status %}active{% endif %}"
-         href="?status={{ value }}">{{ label }}</a>
-    </li>
-  {% endfor %}
-</ul>
-{% if visits %}
+<form method="get" class="row g-2 mb-3">
+  <div class="col-md-2">
+    <select class="form-select" name="status" aria-label="Статус">
+      {% for value, label in status_choices %}
+        <option value="{{ value }}" {% if value == status %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2"><input class="form-control" type="date" name="date" value="{{ day }}" aria-label="Дата"></div>
+  <div class="col-md-2">
+    <select class="form-select" name="place" aria-label="Место">
+      <option value="">Все места</option>
+      {% for p in places %}<option value="{{ p.id }}" {% if p.id|stringformat:"s" == place %}selected{% endif %}>{{ p.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="user" aria-label="Пользователь">
+      <option value="">Все пользователи</option>
+      {% for u in users %}<option value="{{ u.id }}" {% if u.id|stringformat:"s" == user %}selected{% endif %}>{{ u.name }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="sort" aria-label="Сортировка">
+      {% for value, label in sort_options.items %}<option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>{% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid"><button class="btn btn-success">Применить</button></div>
+</form>
+{% if page_obj %}
 <table class="table table-hover bg-white shadow-sm">
   <thead><tr><th>№</th><th>Дата</th><th>Место</th><th>Пользователь</th><th>Человек</th><th>Статус</th></tr></thead>
   <tbody>
-  {% for visit in visits %}
+  {% for visit in page_obj %}
     <tr class="{% if visit.status == 'cancelled' %}text-muted{% endif %}">
       <td><a href="{% url 'visits:detail' visit.id %}">№{{ visit.id }}</a></td>
-      <td>{{ visit.day|date:"d.m.Y" }}</td>
-      <td><a href="{% url 'places:detail' visit.place_id %}">{{ visit.place_name }}</a></td>
-      <td>{{ visit.user_name }}</td>
+      <td>{{ visit.date|date:"d.m.Y" }}</td>
+      <td><a href="{% url 'places:detail' visit.place.id %}">{{ visit.place.name }}</a></td>
+      <td>{{ visit.user.name }}</td>
       <td>{{ visit.people }}</td>
-      <td>{{ visit.status_label|capfirst }}</td>
+      <td>{{ visit.get_status_display }}</td>
     </tr>
   {% endfor %}
   </tbody>
 </table>
+{% include "includes/pagination.html" %}
 {% else %}
-<p class="text-muted">Посещений нет.</p>
+<p class="text-muted">Посещений по заданным условиям нет.</p>
 {% endif %}
 {% endblock %}

@@ -5,12 +5,12 @@
 <h1 class="mt-2">Посещение №{{ visit.id }}</h1>
 <dl class="row bg-white rounded-3 p-3 shadow-sm">
   <dt class="col-sm-3">Место</dt>
-  <dd class="col-sm-9"><a href="{% url 'places:detail' visit.place_id %}">{{ visit.place_name }}</a></dd>
-  <dt class="col-sm-3">Пользователь</dt><dd class="col-sm-9">{{ visit.user_name }} ({{ visit.user_email }})</dd>
-  <dt class="col-sm-3">Дата</dt><dd class="col-sm-9">{{ visit.day|date:"l, d E Y" }}</dd>
+  <dd class="col-sm-9"><a href="{% url 'places:detail' visit.place.id %}">{{ visit.place.name }}</a></dd>
+  <dt class="col-sm-3">Пользователь</dt><dd class="col-sm-9">{{ visit.user.name }} ({{ visit.user.email }})</dd>
+  <dt class="col-sm-3">Дата</dt><dd class="col-sm-9">{{ visit.date|date:"l, d E Y" }}</dd>
   <dt class="col-sm-3">Человек</dt><dd class="col-sm-9">{{ visit.people }}</dd>
   <dt class="col-sm-3">Стоимость</dt><dd class="col-sm-9">{{ visit.cost|floatformat:0 }} руб.</dd>
-  <dt class="col-sm-3">Статус</dt><dd class="col-sm-9">{{ visit.status_label|capfirst }}</dd>
+  <dt class="col-sm-3">Статус</dt><dd class="col-sm-9">{{ visit.get_status_display }}</dd>
   <dt class="col-sm-3">Оценка</dt><dd class="col-sm-9">{{ visit.rating|default:"—" }}</dd>
 </dl>
 {% endblock %}

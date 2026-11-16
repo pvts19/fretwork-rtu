@@ -7,18 +7,18 @@
 <dl class="row bg-white rounded-3 p-3 shadow-sm">
   <dt class="col-sm-3">Адрес</dt><dd class="col-sm-9">{{ place.address }}</dd>
   <dt class="col-sm-3">Цена</dt>
-  <dd class="col-sm-9">{{ place.price|floatformat:0|default:"0" }} руб./чел.</dd>
+  <dd class="col-sm-9">{{ place.price|floatformat:0 }} руб./чел.</dd>
   <dt class="col-sm-3">Вместимость</dt><dd class="col-sm-9">{{ place.capacity }} чел.</dd>
   <dt class="col-sm-3">Часы работы</dt><dd class="col-sm-9">{{ place.hours }}</dd>
   <dt class="col-sm-3">Рейтинг</dt>
-  <dd class="col-sm-9">{{ rating|default:"нет оценок" }}</dd>
+  <dd class="col-sm-9">{{ rating|floatformat:1|default:"нет оценок" }}</dd>
 </dl>
 <h2 class="h4">Запланированные посещения</h2>
 <ul class="list-group">
   {% for visit in visits %}
     <li class="list-group-item">
-      <a href="{% url 'visits:detail' visit.id %}">{{ visit.day|date:"d E Y" }}</a>
-      — {{ visit.people }} чел.
+      <a href="{% url 'visits:detail' visit.id %}">{{ visit.date|date:"d E Y" }}</a>
+      — {{ visit.people }} чел. ({{ visit.user.name }})
     </li>
   {% empty %}
     <li class="list-group-item text-muted">Нет запланированных посещений</li>

@@ -138,6 +138,44 @@ sqlite3 data/restspot.sqlite < sql/queries.sql
 Ограничение: в SQLite `LIKE` без учёта регистра работает только для
 латиницы, поэтому поиск по русскому тексту чувствителен к регистру.
 
+## Django ORM (ПР9)
+
+Начиная с ПР9 веб-приложение работает с базой `db.sqlite3` через модели
+Django, прямые SQL-запросы из представлений убраны (модуль `db/` и файлы
+`sql/` сохранены как результат ПР7 и используются для переноса данных).
+
+| Модель | Приложение | Поля | Связи |
+|---|---|---|---|
+| `Place` | `places` | name, category (choices), address, price, capacity, open_hour, close_hour | `visits` — обратная связь |
+| `User` | `users` | name, email (unique) | `visits` — обратная связь |
+| `Visit` | `visits` | date, people, status (choices), rating | `place` → Place, `user` → User (`on_delete=CASCADE`, `related_name='visits'`) |
+
+Первый запуск:
+
+```bash
+python manage.py migrate
+python -m db.import_json        # база ПР7 из JSON (если её нет)
+python manage.py import_data    # перенос в модели Django с сохранением id
+python manage.py runserver
+```
+
+Что реализовано через ORM:
+
+- список мест: поиск `Q(name__icontains) | Q(address__icontains)`, фильтр по
+  категории и цене, сортировка (название, цена, рейтинг, популярность),
+  `annotate(Avg, Count)`, пагинация `Paginator` по 6 мест;
+- карточка места: `get_object_or_404`, активные посещения через
+  `place.visits` + `select_related('user')`;
+- свободные места на дату: `annotate(Sum(..., filter=Q(...)))`,
+  отменённые посещения вместимость не занимают;
+- список посещений: `select_related('place', 'user')`, фильтры по статусу,
+  дате, месту, пользователю, сортировка, пагинация с сохранением фильтров;
+- статистика: `aggregate(Count, Sum, Avg, Min, Max)`,
+  `values('status').annotate(...)`, `filter(cnt__gt=1)`;
+- некорректные GET-параметры игнорируются, отсутствующие объекты — 404.
+
+Тесты Django (`tests/test_orm.py`) запускаются через `pytest` (pytest-django).
+
 ## Запуск
 
 ```bash

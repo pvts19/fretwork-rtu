@@ -2,6 +2,7 @@
   <div class="card h-100 shadow-sm rs-card">
     <div class="card-body">
       <span class="badge rs-badge mb-2">{{ place.category }}</span>
+      {% if place.rating %}<span class="badge text-bg-warning mb-2">★ {{ place.rating|floatformat:1 }}</span>{% endif %}
       <h5 class="card-title">{{ place.name }}</h5>
       <p class="card-text text-muted">{{ place.address|truncatechars:40 }}</p>
       <p class="card-text">

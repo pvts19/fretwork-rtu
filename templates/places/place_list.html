@@ -6,28 +6,38 @@
   <a class="btn btn-outline-success" href="{% url 'places:free' %}">Свободные места на дату</a>
 </div>
 <form method="get" class="row g-2 mb-3">
-  <div class="col-md-5">
+  <div class="col-md-4">
     <input class="form-control" type="search" name="q" value="{{ text }}"
            placeholder="Поиск по названию или адресу" aria-label="Поиск">
   </div>
-  <div class="col-md-4">
+  <div class="col-md-2">
     <select class="form-select" name="category" aria-label="Категория">
       <option value="">Все категории</option>
-      {% for c in categories %}
-        <option value="{{ c }}" {% if c == category %}selected{% endif %}>{{ c }}</option>
+      {% for value, label in categories %}
+        <option value="{{ value }}" {% if value == category %}selected{% endif %}>{{ label }}</option>
       {% endfor %}
     </select>
   </div>
-  <div class="col-md-3 d-grid"><button class="btn btn-success">Найти</button></div>
+  <div class="col-md-2">
+    <input class="form-control" type="number" min="0" name="max_price" value="{{ max_price }}"
+           placeholder="Цена до" aria-label="Максимальная цена">
+  </div>
+  <div class="col-md-2">
+    <select class="form-select" name="sort" aria-label="Сортировка">
+      {% for value, label in sort_options.items %}
+        <option value="{{ value }}" {% if value == sort %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="col-md-2 d-grid"><button class="btn btn-success">Найти</button></div>
 </form>
-<input id="place-filter" class="form-control mb-4" type="search"
-       placeholder="Быстрый фильтр без перезагрузки…" aria-label="Фильтр мест">
+<p class="text-muted small">Найдено: {{ page_obj.paginator.count }}</p>
 <div class="row">
-  {% for place in places %}
+  {% for place in page_obj %}
     {% include "includes/place_card.html" %}
   {% empty %}
     <p class="text-muted">Ничего не найдено.</p>
   {% endfor %}
 </div>
-<p id="place-filter-empty" class="text-muted d-none">Ничего не найдено.</p>
+{% include "includes/pagination.html" %}
 {% endblock %}

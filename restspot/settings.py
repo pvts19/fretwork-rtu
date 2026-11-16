@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'homepage',
     'places',
     'visits',
+    'users',
 ]
 
 MIDDLEWARE = [
