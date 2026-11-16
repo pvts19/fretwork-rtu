@@ -1,6 +1,6 @@
 import pytest
 
-import places as pl
+import place_service as pl
 from models import Place
 
 

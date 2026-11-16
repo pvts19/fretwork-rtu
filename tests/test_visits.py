@@ -1,6 +1,6 @@
 import pytest
 
-import visits as vs
+import visit_service as vs
 from models import Place, User, Visit
 
 FUTURE = "2099-01-01"

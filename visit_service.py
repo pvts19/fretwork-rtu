@@ -1,6 +1,6 @@
 """Функции работы с коллекцией посещений."""
 from models import Place, Visit
-from places import find_place, next_id
+from place_service import find_place, next_id
 
 
 def available_places(places: list[Place], visits: list[Visit], day: str,

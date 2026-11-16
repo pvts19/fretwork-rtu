@@ -54,18 +54,45 @@ RestSpot помогает быстро найти, где провести св�
 посещение. Статус посещения инкапсулирован (`_status`) и меняется только
 методами `cancel()` / `complete()`.
 
-## Структура проекта (консольная версия)
+## Структура проекта
 
 ```
 restspot/
-├── main.py          # меню консольного приложения
-├── models/          # классы Entity, Place, User, Visit
-├── places.py        # функции работы с коллекцией мест
-├── visits.py        # функции работы с коллекцией посещений
-├── storage.py       # загрузка/сохранение объектов в JSON
-├── utils.py         # ввод и вывод в консоли
-├── data/            # places.json, users.json, visits.json
-└── tests/           # тесты pytest
+├── main.py            # меню консольного приложения
+├── models/            # классы Entity, Place, User, Visit
+├── place_service.py   # функции работы с коллекцией мест
+├── visit_service.py   # функции работы с коллекцией посещений
+├── storage.py         # загрузка/сохранение объектов в JSON
+├── utils.py           # ввод и вывод в консоли
+├── data/              # places.json, users.json, visits.json
+├── tests/             # тесты pytest
+├── manage.py          # управление Django-проектом
+├── restspot/          # настройки Django: settings.py, urls.py
+├── homepage/          # приложение «Главная страница»
+├── places/            # приложение «Места отдыха»
+└── visits/            # приложение «Посещения»
+```
+
+В ПР5 модули `places.py` / `visits.py` консольной версии переименованы в
+`place_service.py` / `visit_service.py`, чтобы освободить имена для
+Django-приложений.
+
+## Веб-приложение (Django)
+
+| URL | View-функция | Страница |
+|---|---|---|
+| `/` | `homepage.views.index` | главная |
+| `/places/` | `places.views.place_list` | список мест |
+| `/places/<id>/` | `places.views.place_detail` | карточка места |
+| `/visits/` | `visits.views.visit_list` | список посещений |
+| `/visits/<id>/` | `visits.views.visit_detail` | карточка посещения |
+
+Данные пока берутся из JSON через классы ПР3 (`storage.py`),
+оформление — Bootstrap 5. Для несуществующих объектов возвращается 404.
+
+```bash
+python manage.py check
+python manage.py runserver    # http://127.0.0.1:8000/
 ```
 
 ## Запуск

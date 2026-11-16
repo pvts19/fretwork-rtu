@@ -1,8 +1,8 @@
 """RestSpot — поиск мест для отдыха. Консольная версия (объектная модель)."""
 from datetime import datetime
 
-import places as pl
-import visits as vs
+import place_service as pl
+import visit_service as vs
 from storage import (PLACES_FILE, VISITS_FILE, load_places, load_users,
                      load_visits, save_objects)
 from utils import ask_date, ask_float, ask_int, print_places
