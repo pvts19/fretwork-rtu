@@ -19,7 +19,7 @@ SORT_OPTIONS = {
 def visit_list(request):
     visits = Visit.objects.select_related('place', 'user')
     status = request.GET.get('status', '')
-    if status in dict(Visit.STATUS_CHOICES):
+    if status in dict(Visit.Status.choices):
         visits = visits.filter(status=status)
     else:
         status = ''
@@ -42,7 +42,7 @@ def visit_list(request):
     context = {
         'page_obj': page_obj,
         'querystring': querystring,
-        'status_choices': [('', 'Все')] + Visit.STATUS_CHOICES,
+        'status_choices': [('', 'Все')] + Visit.Status.choices,
         'sort_options': SORT_OPTIONS,
         'places': Place.objects.only('id', 'name'),
         'users': User.objects.only('id', 'name'),
@@ -59,8 +59,8 @@ def visit_detail(request, visit_id):
 
 
 def stats(request):
-    not_cancelled = ~Q(visits__status=Visit.CANCELLED)
-    labels = dict(Visit.STATUS_CHOICES)
+    not_cancelled = ~Q(visits__status=Visit.Status.CANCELLED)
+    labels = dict(Visit.Status.choices)
     context = {
         'totals': Visit.objects.aggregate(
             visits=Count('id'), people=Sum('people'),

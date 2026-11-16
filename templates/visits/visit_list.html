@@ -39,9 +39,9 @@
   <tbody>
   {% for visit in page_obj %}
     <tr class="{% if visit.status == 'cancelled' %}text-muted{% endif %}">
-      <td><a href="{% url 'visits:detail' visit.id %}">№{{ visit.id }}</a></td>
+      <td><a href="{{ visit.get_absolute_url }}">№{{ visit.id }}</a></td>
       <td>{{ visit.date|date:"d.m.Y" }}</td>
-      <td><a href="{% url 'places:detail' visit.place.id %}">{{ visit.place.name }}</a></td>
+      <td><a href="{{ visit.place.get_absolute_url }}">{{ visit.place.name }}</a></td>
       <td>{{ visit.user.name }}</td>
       <td>{{ visit.people }}</td>
       <td>{{ visit.get_status_display }}</td>

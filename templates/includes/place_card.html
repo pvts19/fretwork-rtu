@@ -9,7 +9,7 @@
         {% if place.price %}{{ place.price|floatformat:0 }} руб./чел.{% else %}Бесплатно{% endif %}
         · {{ place.hours }}
       </p>
-      <a href="{% url 'places:detail' place.id %}" class="btn btn-sm btn-success">Подробнее</a>
+      <a href="{{ place.get_absolute_url }}" class="btn btn-sm btn-success">Подробнее</a>
     </div>
   </div>
 </div>

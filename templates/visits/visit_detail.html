@@ -5,7 +5,7 @@
 <h1 class="mt-2">Посещение №{{ visit.id }}</h1>
 <dl class="row bg-white rounded-3 p-3 shadow-sm">
   <dt class="col-sm-3">Место</dt>
-  <dd class="col-sm-9"><a href="{% url 'places:detail' visit.place.id %}">{{ visit.place.name }}</a></dd>
+  <dd class="col-sm-9"><a href="{{ visit.place.get_absolute_url }}">{{ visit.place.name }}</a></dd>
   <dt class="col-sm-3">Пользователь</dt><dd class="col-sm-9">{{ visit.user.name }} ({{ visit.user.email }})</dd>
   <dt class="col-sm-3">Дата</dt><dd class="col-sm-9">{{ visit.date|date:"l, d E Y" }}</dd>
   <dt class="col-sm-3">Человек</dt><dd class="col-sm-9">{{ visit.people }}</dd>

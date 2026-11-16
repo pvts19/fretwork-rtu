@@ -22,9 +22,9 @@ def data(db):
     user = User.objects.create(name='Анна', email='anna@example.com')
     Visit.objects.create(place=cafe, user=user, date=DAY, people=8)
     Visit.objects.create(place=cafe, user=user, date=DAY, people=5,
-                         status=Visit.CANCELLED)
+                         status=Visit.Status.CANCELLED)
     Visit.objects.create(place=park, user=user, date=date(2020, 1, 1),
-                         people=2, status=Visit.DONE, rating=4)
+                         people=2, status=Visit.Status.DONE, rating=4)
     return cafe, park, user
 
 
@@ -37,9 +37,9 @@ def test_related_objects(data):
 
 
 def test_cancel(data):
-    visit = Visit.objects.filter(status=Visit.ACTIVE).get()
+    visit = Visit.objects.filter(status=Visit.Status.ACTIVE).get()
     visit.cancel()
-    assert Visit.objects.get(pk=visit.pk).status == Visit.CANCELLED
+    assert Visit.objects.get(pk=visit.pk).status == Visit.Status.CANCELLED
     with pytest.raises(ValueError):
         visit.cancel()
 
@@ -78,3 +78,36 @@ def test_stats(client, data):
     response = client.get(reverse('visits:stats'))
     assert response.context['totals']['visits'] == 3
     assert response.status_code == 200
+
+
+def test_slug_and_absolute_url(client, data):
+    cafe, park, user = data
+    assert cafe.slug == 'kafe'
+    twin = Place.objects.create(name='Кафе', category='Кафе', address='ул. В',
+                                price=1, capacity=1, open_hour=1,
+                                close_hour=2)
+    assert twin.slug == 'kafe-2'
+    response = client.get(cafe.get_absolute_url())
+    assert response.status_code == 200 and response.context['place'] == cafe
+
+
+def test_active_manager(data):
+    assert Visit.objects.active().count() == 1
+    assert all(v.status == Visit.Status.ACTIVE
+               for v in Visit.objects.active())
+
+
+@pytest.mark.parametrize('url', [
+    'admin:index', 'admin:places_place_changelist',
+    'admin:users_user_changelist', 'admin:visits_visit_changelist',
+])
+def test_admin_pages(admin_client, data, url):
+    assert admin_client.get(reverse(url)).status_code == 200
+
+
+def test_admin_search_and_filter(admin_client, data):
+    url = reverse('admin:visits_visit_changelist')
+    response = admin_client.get(url, {'q': 'anna@example.com'})
+    assert response.context['cl'].result_count == 3
+    response = admin_client.get(url, {'status__exact': 'active'})
+    assert response.context['cl'].result_count == 1

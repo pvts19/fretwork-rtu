@@ -21,7 +21,7 @@ def place_list(request):
     places = Place.objects.annotate(
         rating=Avg('visits__rating'),
         visits_count=Count('visits', filter=~Q(
-            visits__status=Visit.CANCELLED)),
+            visits__status=Visit.Status.CANCELLED)),
     )
     text = request.GET.get('q', '').strip()
     category = request.GET.get('category', '')
@@ -41,7 +41,7 @@ def place_list(request):
     context = {
         'page_obj': page_obj,
         'querystring': querystring,
-        'categories': Place.CATEGORY_CHOICES,
+        'categories': Place.Category.choices,
         'sort_options': SORT_OPTIONS,
         'text': text,
         'category': category,
@@ -51,14 +51,13 @@ def place_list(request):
     return render(request, 'places/place_list.html', context)
 
 
-def place_detail(request, place_id):
+def place_detail(request, slug):
     place = get_object_or_404(
-        Place.objects.annotate(rating=Avg('visits__rating')), pk=place_id)
+        Place.objects.annotate(rating=Avg('visits__rating')), slug=slug)
     context = {
         'place': place,
         'rating': place.rating,
-        'visits': (place.visits.filter(status=Visit.ACTIVE)
-                   .select_related('user')),
+        'visits': place.visits.active().select_related('user'),
     }
     return render(request, 'places/place_detail.html', context)
 
@@ -78,7 +77,7 @@ def free_places(request):
             context['error'] = 'Укажите корректную дату и число человек ≥ 1'
         else:
             booked = Coalesce(Sum('visits__people', filter=Q(
-                visits__date=chosen, visits__status=Visit.ACTIVE)), 0)
+                visits__date=chosen, visits__status=Visit.Status.ACTIVE)), 0)
             context['places'] = [
                 p for p in Place.objects.annotate(booked=booked)
                 if p.capacity - p.booked >= people_count]

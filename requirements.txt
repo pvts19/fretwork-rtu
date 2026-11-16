@@ -1,4 +1,5 @@
 django
+django-debug-toolbar
 pytest
 pytest-django
 flake8

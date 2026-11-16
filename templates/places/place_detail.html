@@ -17,7 +17,7 @@
 <ul class="list-group">
   {% for visit in visits %}
     <li class="list-group-item">
-      <a href="{% url 'visits:detail' visit.id %}">{{ visit.date|date:"d E Y" }}</a>
+      <a href="{{ visit.get_absolute_url }}">{{ visit.date|date:"d E Y" }}</a>
       — {{ visit.people }} чел. ({{ visit.user.name }})
     </li>
   {% empty %}

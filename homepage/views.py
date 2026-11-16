@@ -7,7 +7,7 @@ from visits.models import Visit
 
 def index(request):
     stats = Visit.objects.aggregate(
-        active=Count('id', filter=Q(status=Visit.ACTIVE)))
+        active=Count('id', filter=Q(status=Visit.Status.ACTIVE)))
     context = {
         'places_count': Place.objects.count(),
         'active_count': stats['active'],

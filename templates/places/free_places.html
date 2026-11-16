@@ -22,7 +22,7 @@
           <span class="badge rs-badge mb-2">{{ place.category }}</span>
           <h5>{{ place.name }}</h5>
           <p class="mb-1">Свободно: <b>{{ place.free }}</b> из {{ place.capacity }}</p>
-          <a href="{% url 'places:detail' place.id %}" class="btn btn-sm btn-success">Подробнее</a>
+          <a href="{{ place.get_absolute_url }}" class="btn btn-sm btn-success">Подробнее</a>
         </div></div>
       </div>
     {% empty %}
