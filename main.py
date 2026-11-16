@@ -1,10 +1,10 @@
-"""RestSpot — сервис поиска мест для отдыха. Консольная версия (ПР2)."""
+"""RestSpot — поиск мест для отдыха. Консольная версия (объектная модель)."""
 from datetime import datetime
 
 import places as pl
 import visits as vs
-from storage import (PLACES_FILE, USERS_FILE, VISITS_FILE, load_json,
-                     save_json)
+from storage import (PLACES_FILE, VISITS_FILE, load_places, load_users,
+                     load_visits, save_objects)
 from utils import ask_date, ask_float, ask_int, print_places
 
 MENU = """
@@ -24,9 +24,9 @@ MENU = """
 
 def main() -> None:
     try:
-        places = load_json(PLACES_FILE)
-        users = load_json(USERS_FILE)
-        visits = load_json(VISITS_FILE)
+        places = load_places()
+        users = load_users()
+        visits = load_visits()
     except ValueError as error:
         print(f"Ошибка загрузки данных: {error}")
         return
@@ -64,21 +64,22 @@ def main() -> None:
                     day=ask_date("Дата (ГГГГ-ММ-ДД): "),
                     people=ask_int("Сколько человек: ", 1),
                 )
-                save_json(VISITS_FILE, visits)
-                print(f"Посещение №{visit['id']} запланировано")
+                save_objects(VISITS_FILE, visits)
+                print(f"Посещение №{visit.id} запланировано")
             elif choice == "8":
                 vs.cancel_visit(visits, ask_int("id посещения: ", 1))
-                save_json(VISITS_FILE, visits)
+                save_objects(VISITS_FILE, visits)
                 print("Посещение отменено")
             elif choice == "9":
-                for u in users:
-                    print(f"[{u['id']}] {u['name']}")
+                for user in users:
+                    print(user)
                 user_id = ask_int("id пользователя: ", 1)
-                for v in vs.user_visits(visits, user_id):
-                    place = pl.find_place(places, v["place_id"])
-                    name = place["name"] if place else "?"
-                    print(f"№{v['id']} {v['date']} {name}, "
-                          f"{v['people']} чел., статус: {v['status']}")
+                user = next((u for u in users if u.id == user_id), None)
+                if user is None:
+                    raise ValueError("Пользователь не найден")
+                for visit in user.visits(visits):
+                    place = pl.find_place(places, visit.place_id)
+                    print(visit, "—", place.name if place else "?")
             elif choice == "10":
                 place = pl.add_place(
                     places,
@@ -90,8 +91,8 @@ def main() -> None:
                     open_hour=ask_int("Открывается в (час): "),
                     close_hour=ask_int("Закрывается в (час): "),
                 )
-                save_json(PLACES_FILE, places)
-                print(f"Добавлено место №{place['id']}")
+                save_objects(PLACES_FILE, places)
+                print(f"Добавлено место №{place.id}")
             else:
                 print("Нет такого пункта")
         except ValueError as error:

@@ -1,7 +1,7 @@
 """Ввод и вывод данных в консоли."""
 from datetime import date
 
-from places import is_open_at
+from models import Place
 
 
 def ask_int(prompt: str, minimum: int = 0) -> int:
@@ -45,20 +45,13 @@ def ask_date(prompt: str) -> str:
         return value
 
 
-def format_place(place: dict, hour: int | None = None) -> str:
-    """Строка с описанием места."""
-    text = (f"[{place['id']}] {place['name']} ({place['category']}) — "
-            f"{place['address']}, {place['price']} руб./чел., "
-            f"до {place['capacity']} чел., "
-            f"{place['open_hour']}:00–{place['close_hour']}:00")
-    if hour is not None:
-        text += " — открыто" if is_open_at(place, hour) else " — закрыто"
-    return text
-
-
-def print_places(places: list[dict], hour: int | None = None) -> None:
-    """Печатает список мест."""
+def print_places(places: list[Place], hour: int | None = None) -> None:
+    """Печатает список мест; если задан час — отмечает, открыто ли место."""
     if not places:
         print("Ничего не найдено")
     for place in places:
-        print(format_place(place, hour))
+        if hour is None:
+            print(place)
+        else:
+            state = "открыто" if place.is_open_at(hour) else "закрыто"
+            print(f"{place} — {state}")

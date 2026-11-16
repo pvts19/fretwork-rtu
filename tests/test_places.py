@@ -1,45 +1,51 @@
 import pytest
 
 import places as pl
+from models import Place
 
 
 @pytest.fixture
 def places():
     return [
-        {"id": 1, "name": "Парк", "category": "Парк", "address": "ул. А",
-         "price": 0, "capacity": 100, "open_hour": 6, "close_hour": 24},
-        {"id": 2, "name": "Кафе", "category": "Кафе", "address": "ул. Б",
-         "price": 1000, "capacity": 10, "open_hour": 20, "close_hour": 4},
+        Place(1, "Парк", "Парк", "ул. А", 0, 100, 6, 24),
+        Place(2, "Кафе", "Кафе", "ул. Б", 1000, 10, 20, 4),
     ]
 
 
 def test_add_place_assigns_next_id(places):
     place = pl.add_place(places, "Музей", "Музей", "ул. В", 500, 50, 10, 18)
-    assert place["id"] == 3
+    assert place.id == 3
     assert len(places) == 3
 
 
-def test_add_place_rejects_empty_name(places):
+def test_place_validation():
     with pytest.raises(ValueError):
-        pl.add_place(places, "  ", "Музей", "ул. В", 500, 50, 10, 18)
+        Place(1, "  ", "Музей", "ул. В", 500, 50, 10, 18)
+    with pytest.raises(ValueError):
+        Place(1, "Музей", "Музей", "ул. В", -1, 50, 10, 18)
 
 
 def test_search_and_category(places):
-    assert pl.search_places(places, "ул. б")[0]["id"] == 2
-    assert [p["id"] for p in pl.filter_by_category(places, "парк")] == [1]
+    assert pl.search_places(places, "ул. б")[0].id == 2
+    assert [p.id for p in pl.filter_by_category(places, "парк")] == [1]
 
 
 def test_budget_filter(places):
-    assert [p["id"] for p in pl.filter_by_budget(places, 1500, 2)] == [1]
+    assert [p.id for p in pl.filter_by_budget(places, 1500, 2)] == [1]
 
 
 def test_sort_places(places):
-    assert pl.sort_places(places, "price", reverse=True)[0]["id"] == 2
+    assert pl.sort_places(places, "price", reverse=True)[0].id == 2
     with pytest.raises(ValueError):
         pl.sort_places(places, "unknown")
 
 
 def test_is_open_at_through_midnight(places):
-    assert pl.is_open_at(places[1], 23)
-    assert pl.is_open_at(places[1], 2)
-    assert not pl.is_open_at(places[1], 12)
+    assert places[1].is_open_at(23)
+    assert places[1].is_open_at(2)
+    assert not places[1].is_open_at(12)
+
+
+def test_str_and_dict_roundtrip(places):
+    assert "Кафе" in str(places[1])
+    assert Place.from_dict(places[1].to_dict()) == places[1]

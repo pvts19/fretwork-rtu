@@ -39,14 +39,30 @@ RestSpot помогает быстро найти, где провести св�
 - планирование и отмена посещений;
 - рейтинг мест по оценкам пользователей.
 
+## Объектная модель
+
+| Класс | Атрибуты | Методы |
+|---|---|---|
+| `Entity` (базовый) | `id` | `to_dict()`, `from_dict()` (`@classmethod`), `__eq__`, `__repr__` |
+| `Place(Entity)` | `name`, `category`, `address`, `price`, `capacity`, `open_hour`, `close_hour` | `cost(people)`, `is_open_at(hour)`, `people_on(visits, day)`, `free_capacity(visits, day)`, свойство `hours`, `__str__` |
+| `User(Entity)` | `name`, `email` | `visits(visits)`, `__str__` |
+| `Visit(Entity)` | `place_id`, `user_id`, `date`, `people`, `_status`, `rating` | свойства `status`, `is_active`; `cancel()`, `complete(rating)` (декоратор `@only_active`), `is_past()` (`@staticmethod`), `to_dict()`, `__str__` |
+
+Взаимодействие объектов: `Place.free_capacity()` считает занятость по
+объектам `Visit`, `User.visits()` отбирает посещения пользователя, функции
+`visits.create_visit()` / `cancel_visit()` связывают место, пользователя и
+посещение. Статус посещения инкапсулирован (`_status`) и меняется только
+методами `cancel()` / `complete()`.
+
 ## Структура проекта (консольная версия)
 
 ```
 restspot/
 ├── main.py          # меню консольного приложения
-├── places.py        # функции работы с местами
-├── visits.py        # функции работы с посещениями
-├── storage.py       # загрузка/сохранение JSON
+├── models/          # классы Entity, Place, User, Visit
+├── places.py        # функции работы с коллекцией мест
+├── visits.py        # функции работы с коллекцией посещений
+├── storage.py       # загрузка/сохранение объектов в JSON
 ├── utils.py         # ввод и вывод в консоли
 ├── data/            # places.json, users.json, visits.json
 └── tests/           # тесты pytest
